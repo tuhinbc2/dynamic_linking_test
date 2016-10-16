@@ -1,0 +1,1 @@
+extern "C" std::string GetMyIP2();

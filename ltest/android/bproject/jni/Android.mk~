@@ -1,0 +1,160 @@
+LOCAL_PATH := $(call my-dir)
+
+MY_PATH := $(LOCAL_PATH)
+
+PROJECT_ROOT := $(LOCAL_PATH)/../../../AuthContactSDK/
+
+CURL_PATH := $(PROJECT_ROOT)/../libs/curl/include/nix/
+
+#$(warning $(PROJECT_ROOT))
+
+#ARCHITECTURE := armeabi-v7a
+
+# Prebuilt curl
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := curl-prebuilt
+LOCAL_SRC_FILES := ../../../libs/curl/android/$(TARGET_ARCH_ABI)/libcurl.a
+include $(PREBUILT_STATIC_LIBRARY)
+
+######################Static LIB################
+#include $(CLEAR_VARS)
+#LOCAL_PATH := $(PROJECT_ROOT)/Libcurl
+#LOCAL_MODULE := libcurl-preBuilt
+#LOCAL_SRC_FILES := $(PROJECT_ROOT)/Libcurl/(TARGET_ARCH_ABI)/libcurl.a
+#LOCAL_SRC_FILES := $(PROJECT_ROOT)/Libcurl/armeabi-v7a/libcurl.a
+#LOCAL_EXPORT_C_INCLUDES := $(PROJECT_ROOT)Libcurl/include/curl \
+#include $(PREBUILT_STATIC_LIBRARY)
+
+
+########################ipvcore#################################
+
+include $(CLEAR_VARS)
+LOCAL_PATH := $(PROJECT_ROOT)../../ipvcore/http
+LOCAL_CFLAGS := -std=c++11 $(NDK_FLAGS) -DANDROID -D_PTHREADS -DUSE_JNI
+LOCAL_SRC_FILES := $(LOCAL_PATH)/manager.cpp \
+				$(LOCAL_PATH)/curl_handler.cpp          \
+				$(LOCAL_PATH)/request.cpp         \
+				$(LOCAL_PATH)/response.cpp    \
+				$(LOCAL_PATH)/utils.cpp                              
+            
+LOCAL_C_INCLUDES := $(PROJECT_ROOT)/../../ipvcore \
+					$(CURL_PATH)
+					
+LOCAL_MODULE := ipvcore
+include $(BUILD_STATIC_LIBRARY)
+
+
+#############################AuthContactParser####################
+include $(CLEAR_VARS)
+
+LOCAL_PATH := $(PROJECT_ROOT)/AuthContactParser
+LOCAL_CFLAGS := -std=c++11 $(NDK_FLAGS) -DANDROID -D_PTHREADS -DUSE_JNI
+
+LOCAL_SRC_FILES := $(LOCAL_PATH)/AuthContactParser.cpp        \
+				$(LOCAL_PATH)/Packetizer.cpp                  \
+				$(LOCAL_PATH)/CallAndChatInfoProcessor.cpp    \
+				$(LOCAL_PATH)/ContactAndProfileProcessor.cpp  \
+				$(LOCAL_PATH)/FriendShipStatusProcessor.cpp   \
+				$(LOCAL_PATH)/JsonParser.cpp                  \
+				$(LOCAL_PATH)/UserAuthenticationParser.cpp
+            
+
+LOCAL_C_INCLUDES := $(PROJECT_ROOT)AuthContactParser \
+					$(PROJECT_ROOT)AuthContactSDK \
+					$(PROJECT_ROOT)Wrapper \
+					$(PROJECT_ROOT)UserAuthentication \
+					$(PROJECT_ROOT)/../../ipvcore \
+					$(CURL_PATH)
+					
+					
+LOCAL_MODULE := AuthContactParser
+include $(BUILD_STATIC_LIBRARY)
+
+
+
+########################AuthContactSDK#################################
+
+include $(CLEAR_VARS)
+LOCAL_PATH := $(PROJECT_ROOT)/AuthContactSDK
+LOCAL_CFLAGS := -std=c++11 $(NDK_FLAGS) -DANDROID -D_PTHREADS -DUSE_JNI
+LOCAL_SRC_FILES := $(LOCAL_PATH)/AuthContactController.cpp \
+				$(LOCAL_PATH)/BrokenPacket.cpp          \
+				$(LOCAL_PATH)/IPAddressPort.cpp         \
+				$(LOCAL_PATH)/ConnectivityTester.cpp    \
+				$(LOCAL_PATH)/Logger.cpp                \
+				$(LOCAL_PATH)/Packet.cpp                \
+				$(LOCAL_PATH)/PacketCreator.cpp         \
+				$(LOCAL_PATH)/PacketReceiver.cpp        \
+				$(LOCAL_PATH)/PacketSender.cpp          \
+				$(LOCAL_PATH)/ResourceManager.cpp       \
+				$(LOCAL_PATH)/Socket.cpp                \
+				$(LOCAL_PATH)/EventHandler.cpp                
+            
+LOCAL_C_INCLUDES := $(PROJECT_ROOT)AuthContactParser \
+					$(PROJECT_ROOT)AuthContactSDK \
+					$(PROJECT_ROOT)../wrapper/android \
+					$(PROJECT_ROOT)UserAuthentication \
+					$(PROJECT_ROOT)/../../ipvcore \
+					$(CURL_PATH)
+					
+LOCAL_MODULE := AuthContactSDK
+include $(BUILD_STATIC_LIBRARY)
+
+
+##########################UserAuthenticationSDK##########################  -DUSE_JSON_PARSER
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := UserAuthentication
+LOCAL_PATH := $(PROJECT_ROOT)/UserAuthentication
+LOCAL_CPPFLAGS := -std=c++11 $(NDK_FLAGS) -DANDROID -D_PTHREADS -DUSE_JNI   
+LOCAL_SRC_FILES := $(LOCAL_PATH)/CommonRequest.cpp \
+					$(LOCAL_PATH)/UserAuthenticationController.cpp  \
+					$(LOCAL_PATH)/json11.cpp  \
+					$(LOCAL_PATH)/NotifyHandler.cpp  \
+					$(LOCAL_PATH)/SignIn.cpp  \
+					$(LOCAL_PATH)/SignUp.cpp  \
+					$(LOCAL_PATH)/UACInterface.cpp  \
+					$(LOCAL_PATH)/UdpPacketProcessor.cpp  \
+					$(LOCAL_PATH)/UserAuthentication.cpp 
+LOCAL_STATIC_LIBRARIES := curl-prebuilt
+
+LOCAL_C_INCLUDES := $(PROJECT_ROOT)AuthContactParser \
+					$(PROJECT_ROOT)AuthContactSDK \
+					$(PROJECT_ROOT)UserAuthentication \
+					$(PROJECT_ROOT)../wrapper/android \
+					$(PROJECT_ROOT)/../../ipvcore \
+					$(CURL_PATH)
+
+
+include $(BUILD_STATIC_LIBRARY)
+
+#################################authSDK########################
+
+include $(CLEAR_VARS)
+
+#$(warning $(MY_PATH))
+
+LOCAL_SRC_PATH := $(MY_PATH)/../
+LOCAL_CFLAGS := -std=c++11 $(NDK_FLAGS) -DANDROID -D_PTHREADS -DUSE_JNI
+LOCAL_SRC_FILES := $(LOCAL_SRC_PATH)AuthSDKWrapper.cpp \
+					$(LOCAL_SRC_PATH)AuthEventHandler.cpp
+
+#$(warning $(LOCAL_SRC_PATH))
+
+COMMON_CFLAGS := -Werror -DANDROID 
+LOCAL_C_INCLUDES := $(PROJECT_ROOT)Wrapper \
+					$(NDK_PATH)/platforms/$(TARGET_PLATFORM)/arch-$(TARGET_ARCH)/usr/include \
+					$(PROJECT_ROOT)AuthContactParser \
+					$(PROJECT_ROOT)AuthContactSDK \
+					$(PROJECT_ROOT)UserAuthentication \
+					$(PROJECT_ROOT)/../../ipvcore \
+					$(CURL_PATH)
+
+LOCAL_MODULE := authSDK
+#include $(BUILD_STATIC_LIBRARY)
+
+LOCAL_LDLIBS := -lz -llog
+LOCAL_SHARED_LIBRARIES := AuthContactSDK curl-prebuilt UserAuthentication AuthContactParser ipvcore
+
+include $(BUILD_SHARED_LIBRARY)
