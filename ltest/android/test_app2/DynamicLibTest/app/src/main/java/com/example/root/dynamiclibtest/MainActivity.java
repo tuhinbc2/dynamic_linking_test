@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void getAndShowIp(View i){
         TextView tv = (TextView) findViewById(R.id.textView);
-        tv.setText(GetMyIpSuperFormatted());
+        tv.setText(GetSampleXML());
     }
 
     //core lib
@@ -30,7 +30,9 @@ public class MainActivity extends AppCompatActivity {
 
     //a lib
     public static native String GetMyIpFormatted();
+    public static native String GetMyUserAgent();
 
     //b lib
     public static native String GetMyIpSuperFormatted();
+    public static native String GetSampleXML();
 }

@@ -12,3 +12,11 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_example_root_dynamiclibtest_MainAc
 	jstring result = env->NewStringUTF(val.c_str());
     return result;
 }
+
+extern "C" JNIEXPORT jstring JNICALL Java_com_example_root_dynamiclibtest_MainActivity_GetMyUserAgent(JNIEnv *env, jobject obj)
+{
+	httpbin h;
+	std::string val = h.getMyUserAgent();
+	jstring result = env->NewStringUTF(val.c_str());
+    return result;
+}
